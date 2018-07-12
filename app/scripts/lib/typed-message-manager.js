@@ -2,8 +2,32 @@ const EventEmitter = require('events')
 const ObservableStore = require('obs-store')
 const createId = require('./random-id')
 const assert = require('assert')
-const sigUtil = require('eth-sig-util')
 const log = require('loglevel')
+const Validator = require('jsonschema').Validator
+const jsonschema = new Validator()
+
+const TYPED_MESSAGE_SCHEMA = {
+  type: 'object',
+  properties: {
+    types: {
+      type: 'object',
+      additionalProperties: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            name: {type: 'string'},
+            type: {type: 'string'},
+          },
+          required: ['name', 'type'],
+        },
+      },
+    },
+    primaryType: {type: 'string'},
+    domain: {type: 'object'},
+    message: {type: 'object'},
+  },
+}
 
 /**
  * Represents, and contains data about, an 'eth_signTypedData' type signature request. These are created when a
@@ -103,14 +127,15 @@ module.exports = class TypedMessageManager extends EventEmitter {
    *
    */
   validateParams (params) {
+
     assert.equal(typeof params, 'object', 'Params should ben an object.')
     assert.ok('data' in params, 'Params must include a data field.')
     assert.ok('from' in params, 'Params must include a from field.')
-    assert.ok(Array.isArray(params.data), 'Data should be an array.')
     assert.equal(typeof params.from, 'string', 'From field must be a string.')
     assert.doesNotThrow(() => {
-      sigUtil.typedSignatureHash(params.data)
-    }, 'Expected EIP712 typed data')
+      const validation = jsonschema.validate(JSON.parse(params.data), TYPED_MESSAGE_SCHEMA)
+      assert.equal(validation.errors.length, 0, 'Data should conform to EIP712 schema.')
+    }, 'Data should be passed as a JSON string.')
   }
 
   /**

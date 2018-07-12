@@ -2,6 +2,7 @@ const Component = require('react').Component
 const h = require('react-hyperscript')
 const inherits = require('util').inherits
 const extend = require('xtend')
+const { ObjectInspector } = require('react-inspector')
 
 module.exports = TypedMessageRenderer
 
@@ -33,14 +34,7 @@ TypedMessageRenderer.prototype.render = function () {
 }
 
 function renderTypedData (values) {
-  return values.map(function (value) {
-    let v = value.value
-    if (typeof v === 'boolean') {
-      v = v.toString()
-    }
-    return h('div', {}, [
-      h('strong', {style: {display: 'block', fontWeight: 'bold'}}, String(value.name) + ':'),
-      h('div', {}, v),
-    ])
-  })
+  return [
+    h(ObjectInspector, { data: JSON.parse(values).message, expandLevel: 1 }),
+  ]
 }

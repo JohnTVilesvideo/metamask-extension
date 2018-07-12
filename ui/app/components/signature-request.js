@@ -13,6 +13,7 @@ const AccountDropdownMini = require('./dropdowns/account-dropdown-mini')
 
 const actions = require('../actions')
 const { conversionUtil } = require('../conversion-util')
+const { ObjectInspector } = require('react-inspector')
 
 const {
   getSelectedAccount,
@@ -165,6 +166,15 @@ SignatureRequest.prototype.msgHexToText = function (hex) {
   }
 }
 
+// eslint-disable-next-line react/display-name
+SignatureRequest.prototype.renderTypedData = function (data) {
+  return [
+    h('div.request-signature__typed-container', [
+      h(ObjectInspector, { data: JSON.parse(data).message, expandLevel: 1 }),
+    ]),
+  ]
+}
+
 SignatureRequest.prototype.renderBody = function () {
   let rows
   let notice = this.context.t('youSign') + ':'
@@ -201,9 +211,9 @@ SignatureRequest.prototype.renderBody = function () {
       }),
     }, [notice]),
 
-    h('div.request-signature__rows', [
-
-      ...rows.map(({ name, value }) => {
+    h('div.request-signature__rows', type === 'eth_signTypedData' ?
+      this.renderTypedData(data) :
+      rows.map(({ name, value }) => {
         if (typeof value === 'boolean') {
           value = value.toString()
         }
@@ -213,7 +223,7 @@ SignatureRequest.prototype.renderBody = function () {
         ])
       }),
 
-    ]),
+    ),
 
   ])
 }
