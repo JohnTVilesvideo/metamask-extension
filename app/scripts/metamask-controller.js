@@ -826,7 +826,10 @@ module.exports = class MetamaskController extends EventEmitter {
     return this.typedMessageManager.approveMessage(msgParams)
       .then((cleanMsgParams) => {
         // signs the message
-        return this.keyringController.signTypedMessage(cleanMsgParams)
+        return this.keyringController.signTypedMessage({
+          ...cleanMsgParams,
+          ...{ data: JSON.parse(cleanMsgParams.data) },
+        })
       })
       .then((rawSig) => {
         // tells the listener that the message has been signed
