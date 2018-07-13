@@ -19,7 +19,7 @@ const { TYPED_MESSAGE_SCHEMA } = require('eth-sig-util')
  * @property {Object} msgParams.from The address that is making the signature request.
  * @property {string} msgParams.data A hex string conversion of the raw buffer data of the signature request
  * @property {number} time The epoch time at which the this message was created
- * @property {string} status Indicates whether the signature request is 'unapproved', 'approved', 'signed' or 'rejected'
+ * @property {string} status Indicates whether the signature request is 'unapproved', 'approved', 'signed', 'rejected', or 'errored'
  * @property {string} type The json-prc signing method for which a signature request has been made. A 'Message' will
  * always have a 'eth_signTypedData' type.
  *
@@ -201,6 +201,19 @@ module.exports = class TypedMessageManager extends EventEmitter {
     this._setMsgStatus(msgId, 'rejected')
   }
 
+  /**
+   * Sets a TypedMessage status to 'errored' via a call to this._setMsgStatus.
+   *
+   * @param {number} msgId The id of the TypedMessage to error
+   *
+   */
+  errorMessage (msgId, error) {
+    const msg = this.getMsg(msgId)
+    msg.error = error
+    this._updateMsg(msg)
+    this._setMsgStatus(msgId, 'errored')
+  }
+
   //
   // PRIVATE METHODS
   //
@@ -224,7 +237,7 @@ module.exports = class TypedMessageManager extends EventEmitter {
     msg.status = status
     this._updateMsg(msg)
     this.emit(`${msgId}:${status}`, msg)
-    if (status === 'rejected' || status === 'signed') {
+    if (status === 'rejected' || status === 'signed' || status === 'errored') {
       this.emit(`${msgId}:finished`, msg)
     }
   }

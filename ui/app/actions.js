@@ -692,7 +692,7 @@ function signTypedMsg (msgData) {
         if (err) {
           log.error(err)
           dispatch(actions.displayWarning(err.message))
-          return reject(err)
+          return
         }
 
         dispatch(actions.completedTx(msgData.metamaskId))
