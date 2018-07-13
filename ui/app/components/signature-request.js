@@ -168,9 +168,10 @@ SignatureRequest.prototype.msgHexToText = function (hex) {
 
 // eslint-disable-next-line react/display-name
 SignatureRequest.prototype.renderTypedData = function (data) {
+  const { message } = JSON.parse(data)
   return [
     h('div.request-signature__typed-container', [
-      h(ObjectInspector, { data: JSON.parse(data).message, expandLevel: 1 }),
+      message ? h(ObjectInspector, { data: message, expandLevel: 1 }) : '',
     ]),
   ]
 }

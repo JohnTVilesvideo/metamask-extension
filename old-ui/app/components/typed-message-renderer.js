@@ -34,7 +34,6 @@ TypedMessageRenderer.prototype.render = function () {
 }
 
 function renderTypedData (values) {
-  return [
-    h(ObjectInspector, { data: JSON.parse(values).message, expandLevel: 1 }),
-  ]
+  const { message } = JSON.parse(values)
+  return [ message ? h(ObjectInspector, { data: message, expandLevel: 1 }) : '' ]
 }
