@@ -106,7 +106,7 @@ module.exports = class TypedMessageManager extends EventEmitter {
    */
   validateParams (params) {
     let data
-    assert.equal(typeof params, 'object', 'Params shouldb en an object.')
+    assert.equal(typeof params, 'object', 'Params should be an object.')
     assert.ok('data' in params, 'Params must include a data field.')
     assert.ok('from' in params, 'Params must include a from field.')
     assert.equal(typeof params.from, 'string', 'From field must be a string.')
